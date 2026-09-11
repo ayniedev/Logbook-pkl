@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\MentorController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Internship\DashboardController as InternshipDashboardController;
 use App\Http\Controllers\Internship\LogbookController;
@@ -41,6 +44,7 @@ Route::get('/', function () {
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
+    'prevent.back',
 ])->group(function () {
     // Admin
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -50,6 +54,21 @@ Route::middleware([
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         Route::patch('users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
+
+        // Division Management
+        Route::resource('divisions', DivisionController::class)->except(['show', 'destroy']);
+        Route::patch('divisions/{division}/toggle', [DivisionController::class, 'toggle'])->name('divisions.toggle');
+
+        // Mentor Management
+        Route::get('mentors', [MentorController::class, 'index'])->name('mentors.index');
+        Route::get('mentors/{mentor}/edit', [MentorController::class, 'edit'])->name('mentors.edit');
+        Route::put('mentors/{mentor}', [MentorController::class, 'update'])->name('mentors.update');
+        Route::get('mentors/by-division', [MentorController::class, 'getByDivision'])->name('mentors.by-division');
+
+        // Assignment Management
+        Route::resource('assignments', AssignmentController::class)->except(['show', 'destroy']);
+        Route::patch('assignments/{assignment}/toggle', [AssignmentController::class, 'toggle'])->name('assignments.toggle');
+        Route::get('assignments/mentors-by-division', [AssignmentController::class, 'getMentorsByDivision'])->name('assignments.mentors-by-division');
     });
 
     // Internship
@@ -59,9 +78,15 @@ Route::middleware([
     Route::prefix('internship')->name('internship.')->group(function () {
         Route::post('/clock-in', [LogbookController::class, 'clockIn'])->name('logbook.clock-in');
         Route::post('/clock-out', [LogbookController::class, 'clockOut'])->name('logbook.clock-out');
+        Route::post('/overtime/start', [LogbookController::class, 'startOvertime'])->name('logbook.overtime.start');
+        Route::post('/overtime/end', [LogbookController::class, 'endOvertime'])->name('logbook.overtime.end');
         Route::get('/logbook/{logbook}/create', [LogbookController::class, 'create'])->name('logbook.create');
         Route::post('/logbook/{logbook}/store', [LogbookController::class, 'store'])->name('logbook.store');
+        Route::get('/logbook/{logbook}/edit', [LogbookController::class, 'edit'])->name('logbook.edit');
+        Route::put('/logbook/{logbook}/update', [LogbookController::class, 'update'])->name('logbook.update');
         Route::get('/logbook/history', [LogbookController::class, 'history'])->name('logbook.history');
+        Route::get('/logbook/recap-absen', [LogbookController::class, 'exportAbsen'])->name('logbook.recap-absen');
+        Route::get('/logbook/recap-logbook', [LogbookController::class, 'exportLogbook'])->name('logbook.recap-logbook');
     });
 
     // Pembimbing

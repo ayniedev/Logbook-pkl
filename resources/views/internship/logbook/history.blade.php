@@ -17,10 +17,50 @@
             <i class="bi bi-clock-history"></i>
             Riwayat Logbook
         </h3>
-        <a href="{{ route('internship.dashboard') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i>
-            Absen Hari Ini
-        </a>
+        <div class="d-flex gap-2">
+            <div class="dropdown" id="exportDropdown">
+                <button class="btn btn-outline" onclick="document.getElementById('exportDropdown').classList.toggle('active')" style="font-size: 0.85rem;">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    Export PDF
+                    <i class="bi bi-chevron-down" style="font-size: 0.7rem;"></i>
+                </button>
+                <div class="dropdown-menu" style="min-width: 240px; padding: 14px;">
+                    <form action="{{ route('internship.logbook.recap-absen') }}" method="GET" style="margin-bottom: 12px;">
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Recap Absen</div>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 3px; display: block;">Tanggal Mulai</label>
+                            <input type="date" name="date_from" value="{{ date('Y-m-01') }}" class="form-control" required style="padding: 7px 10px; font-size: 0.82rem; width: 100%;">
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 3px; display: block;">Tanggal Akhir</label>
+                            <input type="date" name="date_to" value="{{ date('Y-m-d') }}" class="form-control" required style="padding: 7px 10px; font-size: 0.82rem; width: 100%;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 7px 14px; font-size: 0.82rem;">
+                            <i class="bi bi-download"></i> Download PDF
+                        </button>
+                    </form>
+                    <hr style="margin: 10px 0; border-color: var(--border);">
+                    <form action="{{ route('internship.logbook.recap-logbook') }}" method="GET">
+                        <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Recap Logbook</div>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 3px; display: block;">Tanggal Mulai</label>
+                            <input type="date" name="date_from" value="{{ date('Y-m-01') }}" class="form-control" required style="padding: 7px 10px; font-size: 0.82rem; width: 100%;">
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <label style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 3px; display: block;">Tanggal Akhir</label>
+                            <input type="date" name="date_to" value="{{ date('Y-m-d') }}" class="form-control" required style="padding: 7px 10px; font-size: 0.82rem; width: 100%;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 7px 14px; font-size: 0.82rem;">
+                            <i class="bi bi-download"></i> Download PDF
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <a href="{{ route('internship.dashboard') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i>
+                Absen Hari Ini
+            </a>
+        </div>
     </div>
     <div class="card-body">
         @if($logbooks->count() > 0)
@@ -85,9 +125,13 @@
                                     <td colspan="7" style="background: rgba(217, 92, 92, 0.05); padding: 12px 16px;">
                                         <div style="display: flex; align-items: flex-start; gap: 8px;">
                                             <i class="bi bi-info-circle" style="color: var(--danger); margin-top: 2px;"></i>
-                                            <div>
+                                            <div style="flex: 1;">
                                                 <div style="font-size: 0.8rem; font-weight: 600; color: var(--danger); margin-bottom: 4px;">Alasan Penolakan</div>
-                                                <div style="font-size: 0.85rem; color: var(--text);">{{ $logbook->rejection_reason }}</div>
+                                                <div style="font-size: 0.85rem; color: var(--text); margin-bottom: 10px;">{{ $logbook->rejection_reason }}</div>
+                                                <a href="{{ route('internship.logbook.edit', $logbook->id) }}" class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 14px;">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                    Perbaiki Logbook
+                                                </a>
                                             </div>
                                         </div>
                                     </td>

@@ -28,6 +28,7 @@ class User extends Authenticatable
     protected $fillable = [
         'role_id',
         'pembimbing_id',
+        'division_id',
         'username',
         'name',
         'email',
@@ -94,5 +95,29 @@ class User extends Authenticatable
     public function logbooks(): HasMany
     {
         return $this->hasMany(\App\Models\Logbook::class);
+    }
+
+    /**
+     * Get the division this user belongs to (for Pembimbing).
+     */
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Division::class);
+    }
+
+    /**
+     * Get the internship assignments where this user is the mentor.
+     */
+    public function mentorAssignments(): HasMany
+    {
+        return $this->hasMany(\App\Models\InternshipAssignment::class, 'mentor_id');
+    }
+
+    /**
+     * Get the internship assignment for this user (for Internship).
+     */
+    public function internshipAssignment(): HasOne
+    {
+        return $this->hasOne(\App\Models\InternshipAssignment::class, 'internship_id');
     }
 }

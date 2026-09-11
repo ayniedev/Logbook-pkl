@@ -7,6 +7,7 @@ use App\Models\Logbook;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LogbookController extends Controller
 {
@@ -102,6 +103,69 @@ class LogbookController extends Controller
     }
 
     /**
+     * Start Overtime - begin overtime after clocking in.
+     */
+    public function startOvertime()
+    {
+        $user = Auth::user();
+        $today = now()->toDateString();
+
+        // Get today's logbook
+        $logbook = Logbook::where('user_id', $user->id)
+            ->whereDate('clock_in', $today)
+            ->whereNull('clock_out')
+            ->first();
+
+        if (!$logbook) {
+            return redirect()->route('internship.dashboard')
+                ->with('error', 'Tidak ada absen masuk untuk memulai lembur.');
+        }
+
+        // Check if overtime already started
+        if ($logbook->overtime_started_at) {
+            return redirect()->route('internship.dashboard')
+                ->with('error', 'Lembur sudah dimulai hari ini.');
+        }
+
+        // Start overtime
+        $logbook->update([
+            'overtime_started_at' => now(),
+        ]);
+
+        return redirect()->route('internship.dashboard')
+            ->with('success', 'Lembur berhasil dimulai!');
+    }
+
+    /**
+     * End Overtime - finish overtime.
+     */
+    public function endOvertime()
+    {
+        $user = Auth::user();
+        $today = now()->toDateString();
+
+        // Get today's logbook
+        $logbook = Logbook::where('user_id', $user->id)
+            ->whereDate('clock_in', $today)
+            ->whereNotNull('overtime_started_at')
+            ->whereNull('overtime_ended_at')
+            ->first();
+
+        if (!$logbook) {
+            return redirect()->route('internship.dashboard')
+                ->with('error', 'Tidak ada lembur yang perlu diselesaikan.');
+        }
+
+        // End overtime
+        $logbook->update([
+            'overtime_ended_at' => now(),
+        ]);
+
+        return redirect()->route('internship.dashboard')
+            ->with('success', 'Lembur berhasil diselesaikan!');
+    }
+
+    /**
      * Show form to fill logbook details.
      */
     public function create(Logbook $logbook)
@@ -144,6 +208,62 @@ class LogbookController extends Controller
     }
 
     /**
+     * Show form to edit a rejected logbook (fix & resubmit).
+     */
+    public function edit(Logbook $logbook)
+    {
+        // Ensure user owns this logbook
+        if ($logbook->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Only rejected logbooks can be edited
+        if ($logbook->approval_status !== 'Ditolak') {
+            return redirect()->route('internship.logbook.history')
+                ->with('error', 'Logbook ini tidak dapat diedit.');
+        }
+
+        $projects = Project::where('is_active', true)->get();
+
+        return view('internship.logbook.edit', compact('logbook', 'projects'));
+    }
+
+    /**
+     * Update a rejected logbook and resubmit for review.
+     */
+    public function update(Request $request, Logbook $logbook)
+    {
+        // Ensure user owns this logbook
+        if ($logbook->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Only rejected logbooks can be edited
+        if ($logbook->approval_status !== 'Ditolak') {
+            return redirect()->route('internship.logbook.history')
+                ->with('error', 'Logbook ini tidak dapat diedit.');
+        }
+
+        $validated = $request->validate([
+            'project_id' => ['nullable', 'exists:projects,id'],
+            'activities' => ['required', 'string'],
+            'result' => ['required', 'string'],
+        ]);
+
+        // Update logbook with new data, reset status to Pending, clear rejection reason
+        $logbook->update([
+            'project_id' => $validated['project_id'] ?? null,
+            'activities' => $validated['activities'],
+            'result' => $validated['result'],
+            'approval_status' => 'Pending',
+            'rejection_reason' => null,
+        ]);
+
+        return redirect()->route('internship.logbook.history')
+            ->with('success', 'Logbook berhasil diperbarui dan disubmit ulang!');
+    }
+
+    /**
      * Show logbook history.
      */
     public function history()
@@ -156,5 +276,67 @@ class LogbookController extends Controller
             ->paginate(10);
 
         return view('internship.logbook.history', compact('logbooks'));
+    }
+
+    /**
+     * Export Recap Absen as PDF.
+     */
+    public function exportAbsen(Request $request)
+    {
+        $validated = $request->validate([
+            'date_from' => 'required|date',
+            'date_to'   => 'required|date|after_or_equal:date_from',
+        ]);
+
+        $user = Auth::user();
+        $dateFrom = $validated['date_from'];
+        $dateTo = $validated['date_to'];
+
+        $logbooks = Logbook::where('user_id', $user->id)
+            ->whereDate('clock_in', '>=', $dateFrom)
+            ->whereDate('clock_in', '<=', $dateTo)
+            ->orderBy('clock_in')
+            ->get();
+
+        $carbonFrom = \Carbon\Carbon::parse($dateFrom);
+        $carbonTo = \Carbon\Carbon::parse($dateTo);
+        $periodText = $carbonFrom->translatedFormat('d F Y') . ' – ' . $carbonTo->translatedFormat('d F Y');
+
+        $pdf = Pdf::loadView('internship.logbook.pdf.absen', compact('user', 'logbooks', 'periodText'));
+
+        $filename = 'Recap_Absen_' . str_replace(' ', '_', $user->name) . '_' . $carbonFrom->format('d-m-Y') . '_' . $carbonTo->format('d-m-Y') . '.pdf';
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Export Recap Logbook as PDF.
+     */
+    public function exportLogbook(Request $request)
+    {
+        $validated = $request->validate([
+            'date_from' => 'required|date',
+            'date_to'   => 'required|date|after_or_equal:date_from',
+        ]);
+
+        $user = Auth::user();
+        $dateFrom = $validated['date_from'];
+        $dateTo = $validated['date_to'];
+
+        $logbooks = Logbook::where('user_id', $user->id)
+            ->whereDate('clock_in', '>=', $dateFrom)
+            ->whereDate('clock_in', '<=', $dateTo)
+            ->orderBy('clock_in')
+            ->get();
+
+        $carbonFrom = \Carbon\Carbon::parse($dateFrom);
+        $carbonTo = \Carbon\Carbon::parse($dateTo);
+        $periodText = $carbonFrom->translatedFormat('d F Y') . ' – ' . $carbonTo->translatedFormat('d F Y');
+
+        $pdf = Pdf::loadView('internship.logbook.pdf.logbook', compact('user', 'logbooks', 'periodText'));
+
+        $filename = 'Recap_Logbook_' . str_replace(' ', '_', $user->name) . '_' . $carbonFrom->format('d-m-Y') . '_' . $carbonTo->format('d-m-Y') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

@@ -16,6 +16,8 @@ class Logbook extends Model
         'user_id',
         'clock_in',
         'clock_out',
+        'overtime_started_at',
+        'overtime_ended_at',
         'project_id',
         'activities',
         'result',
@@ -33,6 +35,8 @@ class Logbook extends Model
     protected $casts = [
         'clock_in' => 'datetime',
         'clock_out' => 'datetime',
+        'overtime_started_at' => 'datetime',
+        'overtime_ended_at' => 'datetime',
         'approved_at' => 'datetime',
     ];
 

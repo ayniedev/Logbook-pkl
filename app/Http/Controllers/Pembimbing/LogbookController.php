@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Pembimbing;
 
 use App\Http\Controllers\Controller;
+use App\Models\InternshipAssignment;
 use App\Models\Logbook;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class LogbookController extends Controller
 {
@@ -29,13 +29,25 @@ class LogbookController extends Controller
     }
 
     /**
+     * Get IDs of interns assigned to this mentor.
+     */
+    private function getAssignedInternIds(): array
+    {
+        return InternshipAssignment::where('mentor_id', Auth::id())
+            ->where('is_active', true)
+            ->pluck('internship_id')
+            ->toArray();
+    }
+
+    /**
      * List of peserta (interns) under this pembimbing.
      */
     public function peserta()
     {
         $user = Auth::user();
+        $assignedInternIds = $this->getAssignedInternIds();
 
-        $peserta = User::where('pembimbing_id', $user->id)
+        $peserta = User::whereIn('id', $assignedInternIds)
             ->whereHas('role', function ($q) {
                 $q->where('name', 'Internship');
             })
@@ -53,11 +65,11 @@ class LogbookController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $assignedInternIds = $this->getAssignedInternIds();
 
         // Only logbooks owned by peserta assigned to this pembimbing
-        $query = Logbook::whereHas('user', function ($q) use ($user) {
-            $q->where('pembimbing_id', $user->id);
-        })->with(['user', 'project']);
+        $query = Logbook::whereIn('user_id', $assignedInternIds)
+            ->with(['user', 'project']);
 
         // Filter by status
         $status = $request->input('status');
@@ -67,9 +79,7 @@ class LogbookController extends Controller
 
         // Filter by peserta
         if ($pesertaId = $request->input('peserta_id')) {
-            // Ensure the selected peserta belongs to this pembimbing
-            $validPeserta = User::where('pembimbing_id', $user->id)->where('id', $pesertaId)->exists();
-            if ($validPeserta) {
+            if (in_array($pesertaId, $assignedInternIds)) {
                 $query->where('user_id', $pesertaId);
             }
         }
@@ -81,7 +91,7 @@ class LogbookController extends Controller
 
         $logbooks = $query->orderByDesc('clock_in')->paginate(10)->withQueryString();
 
-        $pesertaList = User::where('pembimbing_id', $user->id)
+        $pesertaList = User::whereIn('id', $assignedInternIds)
             ->whereHas('role', function ($q) {
                 $q->where('name', 'Internship');
             })
@@ -107,10 +117,9 @@ class LogbookController extends Controller
     public function riwayat(Request $request)
     {
         $user = Auth::user();
+        $assignedInternIds = $this->getAssignedInternIds();
 
-        $query = Logbook::whereHas('user', function ($q) use ($user) {
-            $q->where('pembimbing_id', $user->id);
-        })
+        $query = Logbook::whereIn('user_id', $assignedInternIds)
             ->whereIn('approval_status', ['Disetujui', 'Ditolak'])
             ->with(['user', 'project', 'approver']);
 
@@ -184,11 +193,9 @@ class LogbookController extends Controller
      */
     private function authorizeLogbook(Logbook $logbook): void
     {
-        $isOwned = User::where('id', $logbook->user_id)
-            ->where('pembimbing_id', Auth::id())
-            ->exists();
+        $assignedInternIds = $this->getAssignedInternIds();
 
-        if (!$isOwned) {
+        if (!in_array($logbook->user_id, $assignedInternIds)) {
             abort(403, 'Anda tidak memiliki akses ke logbook ini.');
         }
     }

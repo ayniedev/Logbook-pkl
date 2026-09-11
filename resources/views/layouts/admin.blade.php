@@ -97,6 +97,24 @@
                                 <p>Manajemen User</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.divisions.index') }}" class="nav-link {{ request()->routeIs('admin.divisions.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-diagram-3-fill"></i>
+                                <p>Manajemen Divisi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.mentors.index') }}" class="nav-link {{ request()->routeIs('admin.mentors.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-person-badge-fill"></i>
+                                <p>Manajemen Pembimbing</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.assignments.index') }}" class="nav-link {{ request()->routeIs('admin.assignments.*') ? 'active' : '' }}">
+                                <i class="nav-icon bi bi-clipboard2-pulse-fill"></i>
+                                <p>Penempatan PKL</p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </div>

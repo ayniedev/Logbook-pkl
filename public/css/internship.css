@@ -527,6 +527,25 @@ a:hover { color: var(--primary-dark); }
     margin-bottom: 16px;
 }
 
+/* ============ OVERTIME ============ */
+.btn-overtime {
+    background: var(--surface);
+    border: 1.5px solid var(--warning);
+    color: #A66A1E;
+}
+
+.btn-overtime:hover:not(:disabled) {
+    background: rgba(230, 162, 60, 0.10);
+    color: #8A5A18;
+    transform: translateY(-1px);
+}
+
+.btn-overtime.btn-lg {
+    padding: 14px 30px;
+    font-size: 1rem;
+    border-radius: var(--radius);
+}
+
 /* ============ BADGES ============ */
 .badge {
     display: inline-flex;

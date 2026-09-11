@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pembimbing;
 
 use App\Http\Controllers\Controller;
+use App\Models\InternshipAssignment;
 use App\Models\Logbook;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -33,17 +34,17 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        // Base query: logbooks owned by peserta under this pembimbing
-        $logbookQuery = Logbook::whereHas('user', function ($q) use ($user) {
-            $q->where('pembimbing_id', $user->id);
-        });
+        // Get intern IDs assigned to this mentor via internship_assignments
+        $assignedInternIds = InternshipAssignment::where('mentor_id', $user->id)
+            ->where('is_active', true)
+            ->pluck('internship_id')
+            ->toArray();
+
+        // Base query: logbooks owned by assigned peserta
+        $logbookQuery = Logbook::whereIn('user_id', $assignedInternIds);
 
         $stats = [
-            'peserta_aktif' => User::where('pembimbing_id', $user->id)
-                ->whereHas('role', function ($q) {
-                    $q->where('name', 'Internship');
-                })
-                ->count(),
+            'peserta_aktif' => count($assignedInternIds),
             'menunggu' => (clone $logbookQuery)->where('approval_status', 'Diajukan')->count(),
             'disetujui' => (clone $logbookQuery)->where('approval_status', 'Disetujui')->count(),
             'ditolak' => (clone $logbookQuery)->where('approval_status', 'Ditolak')->count(),
