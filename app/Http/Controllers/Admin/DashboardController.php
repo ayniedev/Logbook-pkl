@@ -31,7 +31,12 @@ class DashboardController extends Controller
             'pending_logbooks' => Logbook::where('approval_status', 'Diajukan')->count(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        $assignments = InternshipAssignment::where('is_active', true)
+            ->with(['internship', 'division', 'mentor'])
+            ->latest()
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'assignments'));
     }
 
     private function getDashboardRoute(?string $roleName): string

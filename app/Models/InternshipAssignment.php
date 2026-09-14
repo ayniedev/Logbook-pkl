@@ -11,11 +11,14 @@ class InternshipAssignment extends Model
         'internship_id',
         'division_id',
         'mentor_id',
+        'start_date',
+        'duration_days',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'start_date' => 'date',
     ];
 
     /**

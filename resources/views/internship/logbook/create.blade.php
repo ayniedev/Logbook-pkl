@@ -15,18 +15,18 @@
             </div>
             <div class="card-body">
                 {{-- Attendance Info --}}
-                <div style="display: flex; gap: 24px; padding: 16px; background: var(--surface-secondary); border-radius: var(--radius-sm); margin-bottom: 24px; border: 1px solid var(--border);">
-                    <div style="flex: 1; text-align: center;">
+                <div style="display: flex; flex-wrap: wrap; gap: 16px; padding: 16px; background: var(--surface-secondary); border-radius: var(--radius-sm); margin-bottom: 24px; border: 1px solid var(--border);">
+                    <div style="flex: 1; min-width: 100px; text-align: center;">
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Tanggal</div>
                         <div style="font-weight: 600; color: var(--text);">{{ $logbook->clock_in->format('d M Y') }}</div>
                     </div>
-                    <div style="width: 1px; background: var(--border);"></div>
-                    <div style="flex: 1; text-align: center;">
+                    <div style="width: 1px; background: var(--border); flex-shrink: 0;"></div>
+                    <div style="flex: 1; min-width: 100px; text-align: center;">
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Jam Masuk</div>
                         <div style="font-weight: 600; color: var(--success);">{{ $logbook->clock_in->format('H:i') }}</div>
                     </div>
-                    <div style="width: 1px; background: var(--border);"></div>
-                    <div style="flex: 1; text-align: center;">
+                    <div style="width: 1px; background: var(--border); flex-shrink: 0;"></div>
+                    <div style="flex: 1; min-width: 100px; text-align: center;">
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Jam Keluar</div>
                         <div style="font-weight: 600; color: var(--warning);">{{ $logbook->clock_out ? $logbook->clock_out->format('H:i') : '-' }}</div>
                     </div>

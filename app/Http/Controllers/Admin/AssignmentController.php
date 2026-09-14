@@ -98,6 +98,8 @@ class AssignmentController extends Controller
             'internship_id' => ['required', 'exists:users,id'],
             'division_id' => ['required', 'exists:divisions,id'],
             'mentor_id' => ['required', 'exists:users,id'],
+            'start_date' => ['required', 'date', 'after_or_equal:today'],
+            'duration_days' => ['required', 'integer', 'min:1', 'max:365'],
         ], [
             'internship_id.required' => 'Peserta PKL wajib dipilih.',
             'internship_id.exists' => 'Peserta PKL tidak valid.',
@@ -105,6 +107,11 @@ class AssignmentController extends Controller
             'division_id.exists' => 'Divisi tidak valid.',
             'mentor_id.required' => 'Pembimbing wajib dipilih.',
             'mentor_id.exists' => 'Pembimbing tidak valid.',
+            'start_date.required' => 'Tanggal mulai wajib diisi.',
+            'start_date.after_or_equal' => 'Tanggal mulai harus hari ini atau masa depan.',
+            'duration_days.required' => 'Durasi wajib diisi.',
+            'duration_days.min' => 'Durasi minimal 1 hari.',
+            'duration_days.max' => 'Durasi maksimal 365 hari.',
         ]);
 
         // Validate intern role
@@ -180,6 +187,8 @@ class AssignmentController extends Controller
             'internship_id' => ['required', 'exists:users,id'],
             'division_id' => ['required', 'exists:divisions,id'],
             'mentor_id' => ['required', 'exists:users,id'],
+            'start_date' => ['required', 'date'],
+            'duration_days' => ['required', 'integer', 'min:1', 'max:365'],
         ]);
 
         // Validate intern role

@@ -24,7 +24,7 @@
                     Export PDF
                     <i class="bi bi-chevron-down" style="font-size: 0.7rem;"></i>
                 </button>
-                <div class="dropdown-menu" style="min-width: 240px; padding: 14px;">
+                <div class="dropdown-menu" style="min-width: 220px; max-width: 90vw; padding: 14px;">
                     <form action="{{ route('internship.logbook.recap-absen') }}" method="GET" style="margin-bottom: 12px;">
                         <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Recap Absen</div>
                         <div style="margin-bottom: 8px;">

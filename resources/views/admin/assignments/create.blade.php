@@ -60,6 +60,30 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <!-- Start Date -->
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Tanggal Mulai PKL <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control @error('start_date') is-invalid @enderror"
+                               id="start_date" name="start_date"
+                               value="{{ old('start_date') }}" required>
+                        @error('start_date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="mb-3">
+                        <label for="duration_days" class="form-label">Durasi PKL (Hari) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('duration_days') is-invalid @enderror"
+                               id="duration_days" name="duration_days"
+                               value="{{ old('duration_days') }}"
+                               min="1" max="365" placeholder="Contoh: 60" required>
+                        <small class="text-muted">Contoh: 60 hari (2 bulan), 90 hari (3 bulan)</small>
+                        @error('duration_days')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="card-footer">

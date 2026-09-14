@@ -636,11 +636,13 @@ body {
    ============================================================ */
 .tab-links {
     display: inline-flex;
+    flex-wrap: wrap;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 4px;
     gap: 2px;
+    max-width: 100%;
 }
 
 .tab-links a {
@@ -651,6 +653,7 @@ body {
     color: var(--text-secondary);
     text-decoration: none;
     transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
 }
 
 .tab-links a:hover {
@@ -820,6 +823,139 @@ body {
 }
 
 /* ============================================================
+   Intern Progress Cards
+   ============================================================ */
+.intern-progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: 16px;
+    padding: 0 20px 20px;
+}
+
+.intern-progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.intern-progress-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.intern-progress-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.intern-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.intern-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.intern-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.intern-division {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 1px;
+}
+
+.intern-progress-body {
+    padding-top: 4px;
+}
+
+.progress-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.progress-detail-row .progress-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.progress-pct {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.progress-bar-wrap {
+    width: 100%;
+    height: 10px;
+    background: rgba(147, 80, 115, 0.10);
+    border-radius: 50px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+    border-radius: 50px;
+    transition: width 0.6s ease;
+    min-width: 4px;
+}
+
+.progress-date-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+.progress-date-row i {
+    margin-right: 3px;
+    color: var(--primary);
+}
+
+.progress-empty {
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    text-align: center;
+    padding: 8px 0;
+}
+
+.badge-info {
+    background: rgba(147, 80, 115, 0.12);
+    color: var(--primary);
+}
+
+.badge-secondary {
+    background: rgba(117, 106, 120, 0.12);
+    color: var(--text-secondary);
+}
+
+/* ============================================================
    Responsive
    ============================================================ */
 @media (max-width: 991.98px) {
@@ -863,5 +999,10 @@ body {
 
     .user-name {
         display: none;
+    }
+
+    .intern-progress-grid {
+        grid-template-columns: 1fr;
+        padding: 0 16px 16px;
     }
 }

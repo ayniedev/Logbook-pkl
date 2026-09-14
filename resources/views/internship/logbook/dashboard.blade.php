@@ -26,6 +26,65 @@
     <p style="font-size: 0.88rem; color: var(--text-secondary);">Semoga kegiatan PKL hari ini berjalan lancar.</p>
 </div>
 
+{{-- PKL Progress Card --}}
+@if($assignment && $startDate)
+<div class="card mb-4">
+    <div class="card-header">
+        <h3>
+            <i class="bi bi-graph-up"></i>
+            Progres PKL
+        </h3>
+        @if($status === 'belum_dimulai')
+            <span class="badge badge-secondary">Belum Dimulai</span>
+        @elseif($status === 'berjalan')
+            <span class="badge badge-info">Berlangsung</span>
+        @elseif($status === 'hampir_selesai')
+            <span class="badge badge-warning">Hampir Selesai</span>
+        @elseif($status === 'selesai')
+            <span class="badge badge-success">Selesai</span>
+        @endif
+    </div>
+    <div class="card-body">
+        <div class="progress-info">
+            <div class="progress-detail">
+                <span class="progress-label">Hari ke-{{ $currentDay }} dari {{ $totalDays }} hari</span>
+                <span class="progress-percentage">{{ $percentage }}%</span>
+            </div>
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" style="width: {{ $percentage }}%"></div>
+            </div>
+            <div class="progress-dates">
+                <span><i class="bi bi-calendar-event"></i> {{ $startDate->format('d M Y') }}</span>
+                <span><i class="bi bi-calendar-check"></i> {{ $endDate->format('d M Y') }}</span>
+            </div>
+        </div>
+        <div class="progress-meta">
+            <div class="meta-item">
+                <i class="bi bi-building"></i>
+                <span>{{ $assignment->division->name ?? '-' }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="bi bi-person-badge"></i>
+                <span>{{ $assignment->mentor->name ?? '-' }}</span>
+            </div>
+        </div>
+        @if($isAutoFilled)
+        <div style="margin-top: 12px; padding: 8px 12px; background: rgba(230, 162, 60, 0.08); border: 1px solid rgba(230, 162, 60, 0.20); border-radius: 8px; font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+            <i class="bi bi-info-circle" style="color: var(--warning);"></i>
+            Tanggal mulai & durasi diambil otomatis dari absensi pertama. Hubungi admin untuk pengaturan lebih lanjut.
+        </div>
+        @endif
+    </div>
+</div>
+@elseif(!$assignment)
+<div class="card mb-4">
+    <div class="card-body" style="text-align: center; padding: 24px;">
+        <i class="bi bi-info-circle" style="font-size: 1.5rem; color: var(--text-soft);"></i>
+        <p style="margin-top: 8px; color: var(--text-secondary); font-size: 0.9rem;">Anda belum memiliki penempatan PKL aktif.</p>
+    </div>
+</div>
+@endif
+
 {{-- Stat Cards --}}
 <div class="row mb-4">
     <div class="col-lg-4 col-md-6 mb-3">

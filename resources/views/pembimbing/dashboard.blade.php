@@ -121,4 +121,65 @@
         </div>
     @endif
 </div>
+
+{{-- Section: Progres PKL Peserta --}}
+@if($internProgress->isNotEmpty())
+<div class="card-pmb section-card mt-4">
+    <div class="section-head">
+        <div>
+            <h3><i class="bi bi-graph-up"></i> Progres PKL Peserta</h3>
+            <p>Lihat masa PKL setiap peserta yang kamu bimbing.</p>
+        </div>
+    </div>
+    <div class="intern-progress-grid">
+        @foreach($internProgress as $intern)
+        <div class="intern-progress-card">
+            <div class="intern-progress-header">
+                <div class="intern-avatar">
+                    {{ strtoupper(substr($intern['intern_name'], 0, 1)) }}
+                </div>
+                <div class="intern-info">
+                    <div class="intern-name">{{ $intern['intern_name'] }}</div>
+                    <div class="intern-division">{{ $intern['division_name'] }}</div>
+                </div>
+                @if($intern['status'] === 'belum_dimulai')
+                    <span class="badge-pmb badge-secondary">Belum Mulai</span>
+                @elseif($intern['status'] === 'berjalan')
+                    <span class="badge-pmb badge-info">Berlangsung</span>
+                @elseif($intern['status'] === 'hampir_selesai')
+                    <span class="badge-pmb badge-warning">Hampir Selesai</span>
+                @elseif($intern['status'] === 'selesai')
+                    <span class="badge-pmb badge-success">Selesai</span>
+                @endif
+            </div>
+            @if($intern['start_date'] && $intern['total_days'] > 0)
+            <div class="intern-progress-body">
+                <div class="progress-detail-row">
+                    <span class="progress-label">Hari ke-{{ $intern['current_day'] }} dari {{ $intern['total_days'] }} hari</span>
+                    <span class="progress-pct">{{ $intern['percentage'] }}%</span>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" style="width: {{ $intern['percentage'] }}%"></div>
+                </div>
+                <div class="progress-date-row">
+                    <span><i class="bi bi-calendar-event"></i> {{ $intern['start_date']->format('d M Y') }}</span>
+                    <span><i class="bi bi-calendar-check"></i> {{ $intern['end_date']->format('d M Y') }}</span>
+                </div>
+            </div>
+            @else
+            <div class="intern-progress-body">
+                <div class="progress-empty">Belum ada data tanggal mulai & durasi PKL.</div>
+            </div>
+            @endif
+            @if($intern['is_auto_filled'])
+            <div style="margin-top: 10px; padding: 6px 10px; background: rgba(230, 162, 60, 0.08); border: 1px solid rgba(230, 162, 60, 0.20); border-radius: 8px; font-size: 0.72rem; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;">
+                <i class="bi bi-info-circle" style="color: var(--warning);"></i>
+                Data diambil otomatis dari absensi pertama.
+            </div>
+            @endif
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
 @endsection

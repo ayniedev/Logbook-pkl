@@ -66,6 +66,30 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <!-- Start Date -->
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">Tanggal Mulai PKL <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control @error('start_date') is-invalid @enderror"
+                               id="start_date" name="start_date"
+                               value="{{ old('start_date', $assignment->start_date?->format('Y-m-d')) }}" required>
+                        @error('start_date')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="mb-3">
+                        <label for="duration_days" class="form-label">Durasi PKL (Hari) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control @error('duration_days') is-invalid @enderror"
+                               id="duration_days" name="duration_days"
+                               value="{{ old('duration_days', $assignment->duration_days) }}"
+                               min="1" max="365" placeholder="Contoh: 60" required>
+                        <small class="text-muted">Contoh: 60 hari (2 bulan), 90 hari (3 bulan)</small>
+                        @error('duration_days')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="card-footer">
@@ -102,6 +126,14 @@
                     <tr>
                         <td><strong>Pembimbing</strong></td>
                         <td>{{ $assignment->mentor->name ?? $assignment->mentor->username }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tgl Mulai</strong></td>
+                        <td>{{ $assignment->start_date?->format('d/m/Y') ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Durasi</strong></td>
+                        <td>{{ $assignment->duration_days ? $assignment->duration_days . ' hari' : '-' }}</td>
                     </tr>
                     <tr>
                         <td><strong>Status</strong></td>
